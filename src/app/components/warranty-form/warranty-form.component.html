@@ -1,0 +1,277 @@
+<div class="max-w-6xl mx-auto p-6">
+  <form [formGroup]="warrantyForm" (ngSubmit)="onSubmit()" class="space-y-8">
+    
+    <!-- Mandatory Fields Section -->
+    <div class="bg-white rounded-xl shadow-lg border-l-4 border-red-500">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center space-x-3">
+          <div class="p-2 bg-red-100 rounded-lg">
+            <lucide-icon name="shield" class="h-6 w-6 text-red-600"></lucide-icon>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-gray-800">Mandatory Information</h2>
+            <p class="text-sm text-gray-600">Required fields to activate your warranty</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="p-6 space-y-6">
+        <!-- Serial Number -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            Product Serial Number *
+          </label>
+          <input
+            type="text"
+            formControlName="serialNumber"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+            placeholder="Enter your TV's serial number"
+            [class.border-red-500]="formControls['serialNumber'].invalid && formControls['serialNumber'].touched">
+          <div *ngIf="formControls['serialNumber'].invalid && formControls['serialNumber'].touched" 
+               class="text-red-500 text-sm mt-1 flex items-center">
+            <lucide-icon name="alert-circle" class="h-4 w-4 mr-1"></lucide-icon>
+            Serial number is required
+          </div>
+        </div>
+
+        <!-- Customer Name and Mobile Number -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              Customer Name *
+            </label>
+            <input
+              type="text"
+              formControlName="customerName"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+              placeholder="Enter your full name"
+              [class.border-red-500]="formControls['customerName'].invalid && formControls['customerName'].touched">
+            <div *ngIf="formControls['customerName'].invalid && formControls['customerName'].touched" 
+                 class="text-red-500 text-sm mt-1 flex items-center">
+              <lucide-icon name="alert-circle" class="h-4 w-4 mr-1"></lucide-icon>
+              Customer name is required
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              Mobile Number *
+            </label>
+            <div class="flex space-x-2">
+              <input
+                type="text"
+                formControlName="mobileNumber"
+                class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                placeholder="Enter 10-digit mobile number"
+                [disabled]="otpStep === 'verified'"
+                [class.border-red-500]="formControls['mobileNumber'].invalid && formControls['mobileNumber'].touched">
+              <button
+                *ngIf="otpStep === 'enter'"
+                type="button"
+                (click)="sendOtp()"
+                class="px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center whitespace-nowrap">
+                <lucide-icon name="phone" class="h-4 w-4 mr-1"></lucide-icon>
+                Send OTP
+              </button>
+              <div *ngIf="otpStep === 'verified'" 
+                   class="px-4 py-3 bg-green-100 text-green-700 rounded-lg flex items-center whitespace-nowrap">
+                <lucide-icon name="check-circle" class="h-4 w-4 mr-1"></lucide-icon>
+                Verified
+              </div>
+            </div>
+            <div *ngIf="formControls['mobileNumber'].invalid && formControls['mobileNumber'].touched" 
+                 class="text-red-500 text-sm mt-1 flex items-center">
+              <lucide-icon name="alert-circle" class="h-4 w-4 mr-1"></lucide-icon>
+              Please enter a valid 10-digit mobile number
+            </div>
+          </div>
+        </div>
+
+        <!-- OTP Verification -->
+        <div *ngIf="otpStep === 'verify'" class="bg-red-50 border border-red-200 p-4 rounded-lg">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            Enter OTP *
+          </label>
+          <div class="flex space-x-2">
+            <input
+              type="text"
+              [(ngModel)]="otp"
+              [ngModelOptions]="{standalone: true}"
+              class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+              placeholder="Enter 6-digit OTP">
+            <button
+              type="button"
+              (click)="verifyOtp()"
+              class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+              Verify
+            </button>
+          </div>
+          <p class="text-sm text-gray-600 mt-2">
+            For demo purposes, use OTP: <span class="font-mono font-semibold">123456</span>
+          </p>
+        </div>
+
+        <!-- Mandatory File Uploads -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <lucide-icon name="file-text" class="h-4 w-4 inline mr-1"></lucide-icon>
+              Upload Invoice *
+            </label>
+            <div class="border-2 border-dashed border-gray-300 hover:border-red-400 rounded-lg p-6 text-center transition-colors">
+              <lucide-icon name="file-text" class="h-12 w-12 text-gray-400 mx-auto mb-2"></lucide-icon>
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png,.pdf"
+                (change)="onFileUpload($event, 'invoice')"
+                class="hidden"
+                #invoiceInput>
+              <label (click)="invoiceInput.click()" class="cursor-pointer">
+                <span class="text-red-600 font-medium">Click to upload</span>
+                <p class="text-sm text-gray-500 mt-1">JPG, PNG, PDF (max 50MB)</p>
+              </label>
+              <p *ngIf="invoiceFile" class="text-green-600 text-sm mt-2 flex items-center justify-center">
+                <lucide-icon name="check-circle" class="h-4 w-4 mr-1"></lucide-icon>
+                {{ invoiceFile.name }}
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <lucide-icon name="camera" class="h-4 w-4 inline mr-1"></lucide-icon>
+              Product Picture with Serial Number *
+            </label>
+            <div class="border-2 border-dashed border-gray-300 hover:border-red-400 rounded-lg p-6 text-center transition-colors">
+              <lucide-icon name="camera" class="h-12 w-12 text-gray-400 mx-auto mb-2"></lucide-icon>
+              <input
+                type="file"
+                accept="image/*"
+                (change)="onFileUpload($event, 'product')"
+                class="hidden"
+                #productInput>
+              <label (click)="productInput.click()" class="cursor-pointer">
+                <span class="text-red-600 font-medium">Click to upload</span>
+                <p class="text-sm text-gray-500 mt-1">JPG, PNG (max 50MB)</p>
+              </label>
+              <p *ngIf="productImage" class="text-green-600 text-sm mt-2 flex items-center justify-center">
+                <lucide-icon name="check-circle" class="h-4 w-4 mr-1"></lucide-icon>
+                {{ productImage.name }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="flex items-center">
+      <div class="flex-1 border-t border-gray-300"></div>
+      <div class="px-4 text-sm text-gray-500 font-medium">Optional Information</div>
+      <div class="flex-1 border-t border-gray-300"></div>
+    </div>
+
+    <!-- Non-Mandatory Fields Section -->
+    <div class="bg-white rounded-xl shadow-lg border-l-4 border-blue-500">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center space-x-3">
+          <div class="p-2 bg-blue-100 rounded-lg">
+            <lucide-icon name="user" class="h-6 w-6 text-blue-600"></lucide-icon>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-gray-800">Additional Information</h2>
+            <p class="text-sm text-gray-600">Optional fields for better service and support</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="p-6 space-y-6">
+        <!-- Email and Product Price -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <lucide-icon name="mail" class="h-4 w-4 inline mr-1"></lucide-icon>
+              Email ID
+            </label>
+            <input
+              type="email"
+              formControlName="email"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              placeholder="Enter your email address"
+              [class.border-red-500]="formControls['email'].invalid && formControls['email'].touched">
+            <div *ngIf="formControls['email'].invalid && formControls['email'].touched" 
+                 class="text-red-500 text-sm mt-1 flex items-center">
+              <lucide-icon name="alert-circle" class="h-4 w-4 mr-1"></lucide-icon>
+              Please enter a valid email address
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              Product Price
+            </label>
+            <input
+              type="text"
+              formControlName="productPrice"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              placeholder="Enter product price (without discount)">
+          </div>
+        </div>
+
+        <!-- Address -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <lucide-icon name="map-pin" class="h-4 w-4 inline mr-1"></lucide-icon>
+            Full Address
+          </label>
+          <div class="grid md:grid-cols-4 gap-4">
+            <div class="md:col-span-3">
+              <textarea
+                formControlName="address"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="Enter your complete address"
+                rows="3">
+              </textarea>
+            </div>
+            <div>
+              <input
+                type="text"
+                formControlName="pincode"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="Pincode">
+            </div>
+          </div>
+        </div>
+
+        <!-- Invoice Date -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <lucide-icon name="calendar" class="h-4 w-4 inline mr-1"></lucide-icon>
+            Invoice Date
+          </label>
+          <input
+            type="date"
+            formControlName="invoiceDate"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="text-center pt-6">
+      <button
+        type="submit"
+        [disabled]="isSubmitting"
+        class="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg">
+        <div *ngIf="isSubmitting" class="flex items-center">
+          <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+          Activating Warranty...
+        </div>
+        <div *ngIf="!isSubmitting" class="flex items-center">
+          <lucide-icon name="shield" class="h-5 w-5 mr-2"></lucide-icon>
+          Activate Warranty
+        </div>
+      </button>
+    </div>
+  </form>
+</div>

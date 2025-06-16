@@ -1,0 +1,39 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+  <app-header></app-header>
+  
+  <main class="py-8">
+    <app-warranty-form 
+      *ngIf="currentStep === 'form'"
+      (formSubmit)="onFormSubmit($event)">
+    </app-warranty-form>
+    
+    <app-confirmation-screen
+      *ngIf="currentStep === 'confirmation' && submittedData"
+      [customerName]="submittedData.customerName"
+      [serialNumber]="submittedData.serialNumber"
+      (startOver)="onStartOver()">
+    </app-confirmation-screen>
+  </main>
+
+  <footer class="bg-gray-800 text-white py-8 mt-12">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <div class="grid md:grid-cols-2 gap-8 mb-6">
+        <div>
+          <h3 class="font-semibold mb-2">Beston Electronics</h3>
+          <p class="text-gray-400 text-sm">
+            Leading manufacturer of premium LED TVs and home entertainment solutions.
+          </p>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">SERVIZ Care</h3>
+          <p class="text-gray-400 text-sm">
+            Your trusted partner for extended warranty and premium support services.
+          </p>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 pt-4 text-sm text-gray-400">
+        <p>&copy; 2025 Beston Electronics & SERVIZ Care. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+</div>
